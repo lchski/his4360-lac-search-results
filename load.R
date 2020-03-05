@@ -19,7 +19,8 @@ search_electronic_results <- search_electronic_files %>%
 
 
 
-read_results_json("data/source/search_electronic__fonds_collection.json")
+# curl -v -F "upload=data/source/search_electronic__sous_fonds.json" "http://localhost:8000/convert" -H "accept: application/json"
+read_results_json("data/source/search_electronic__sous_fonds.json")
 
 
 search_electronic_results %>%
@@ -44,4 +45,9 @@ search_electronic_results %>%
   filter(source_file_path == "data/source/search_electronic__sub_series.json") %>%
   remove_extra_columns() %>%
   glimpse
+
+
+## run the API
+plumb("api.R")$run(port=8000)
+
 
