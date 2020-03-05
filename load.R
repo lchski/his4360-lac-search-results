@@ -29,11 +29,41 @@ tbs_incumbent_data <- read_results_json("data/source/TBS - Incumbent System data
 
 na_electronic_fonds <- read_results_json("data/source/na - electronic fonds.json")
 
-z <- fs::dir_ls("data/source/", regexp = "search_electronic") %>%
-  enframe(name = NULL, value = "path") %>%
-  mutate(path = as.character(path)) %>%
-  select(path) %>%
-  pull(path) %>%
-  map_dfr(~ read_results_json(.x), .id = "file")
+search_electronic_files <- fs::dir_ls("data/source/", regexp = "search_electronic") %>%
+  enframe(name = NULL, value = "source_file_path") %>%
+  mutate(
+    source_file_path = as.character(source_file_path),
+    source_file_id = row_number()
+  )
 
+search_electronic_results <- search_electronic_files %>%
+  pull(source_file_path) %>%
+  map_dfr(~ read_results_json(.x), .id = "source_file_id") %>%
+  mutate(source_file_id = as.integer(source_file_id)) %>%
+  left_join(search_electronic_files)
+
+
+
+search_electronic_results %>%
+  filter(
+    AccessConditionDesc %in%
+      c(
+        "Open",
+        "Open, no copying",
+        "Restrictions vary"
+      )
+    ) %>%
+  filter(LanguageOfCataloging == "eng")
+
+
+## compare the CSV to the JSON
+el <- read_csv("data/source/search_electronic__sub_series.csv", skip = 4)
+el %>%
+  remove_extra_columns() %>%
+  glimpse
+
+search_electronic_results %>%
+  filter(source_file_path == "data/source/search_electronic__sub_series.json") %>%
+  remove_extra_columns() %>%
+  glimpse
 
