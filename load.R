@@ -29,5 +29,11 @@ tbs_incumbent_data <- read_results_json("data/source/TBS - Incumbent System data
 
 na_electronic_fonds <- read_results_json("data/source/na - electronic fonds.json")
 
+z <- fs::dir_ls("data/source/", regexp = "search_electronic") %>%
+  enframe(name = NULL, value = "path") %>%
+  mutate(path = as.character(path)) %>%
+  select(path) %>%
+  pull(path) %>%
+  map_dfr(~ read_results_json(.x), .id = "file")
 
 
