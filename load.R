@@ -18,6 +18,8 @@ read_results_json <- function(json_path) {
     group_by(record_id, property_id) %>%
     pivot_wider(names_from = key, values_from = value) %>%
     ungroup() %>%
+    group_by(record_id, N, L) %>% summarise_all(paste, collapse = '\n\n---\n\n') %>% ## when we have multiple values for a property, combine into one string (otherwise pivot_longer snaps)
+    ungroup() %>%
     pivot_wider(id_cols = record_id, names_from = N, values_from = V)
   
   results
@@ -45,7 +47,8 @@ results_raw$SearchResults$Records %>%
   group_by(record_id, property_id) %>%
   pivot_wider(names_from = key, values_from = value) %>%
   ungroup() %>%
-  group_by(record_id, N, L) %>%
-  summarise_all(paste, collapse = '\n\n---\n\n') %>%
+  group_by(record_id, N, L) %>% summarise_all(paste, collapse = '\n\n---\n\n') %>% ## when we have multiple values for a property, combine into one string (otherwise pivot_longer snaps)
   ungroup() %>%
   pivot_wider(id_cols = record_id, names_from = N, values_from = V)
+
+
