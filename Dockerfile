@@ -1,11 +1,7 @@
-FROM trestletech/plumber
+FROM rocker/tidyverse
 LABEL maintainer="lchski"
 
-RUN install2.r --error \
-    --deps TRUE \
-    tidyverse \
-    dplyr \
-    jsonlite
+RUN install2.r plumber
 
 COPY [".", "./"]
 
