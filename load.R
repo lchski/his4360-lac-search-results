@@ -9,7 +9,8 @@ search_electronic_files <- fs::dir_ls("data/source/", regexp = "search_electroni
   mutate(
     source_file_path = as.character(source_file_path),
     source_file_id = row_number()
-  )
+  ) %>%
+  filter(str_detect(source_file_path, ".json"))
 
 search_electronic_results <- search_electronic_files %>%
   pull(source_file_path) %>%
@@ -34,6 +35,38 @@ search_electronic_results %>%
     ) %>%
   filter(LanguageOfCataloging == "eng")
 
+search_electronic_results %>%
+  filter(
+    AccessConditionDesc %in%
+      c(
+        "Open",
+        "Open, no copying",
+        "Restrictions vary"
+      )
+  ) %>%
+  filter(LanguageOfCataloging == "eng") %>%
+  filter(Source == "Private") %>% ## or "Government"
+  filter(str_detect(Title, "electronic")) %>%
+  remove_extra_columns() %>%
+  View()
+
+search_electronic_results %>%
+  filter(
+    AccessConditionDesc %in%
+      c(
+        "Open",
+        "Open, no copying",
+        "Restrictions vary"
+      )
+  ) %>%
+  filter(LanguageOfCataloging == "eng") %>%
+  filter(Source == "Private") %>% ## "Private" or "Government"
+  filter(str_detect(Title, "electronic")) %>%
+  filter(str_detect(TypeOfMaterial, regex("Textual", ignore_case = TRUE))) %>%
+  remove_extra_columns() %>%
+  select(Title, DateIssued, AccessConditionDesc, TypeOfMaterial, DateYear, HierarchyLevel, DisplayUrl) %>%
+  View()
+
 
 ## compare the CSV to the JSON
 el <- read_csv("data/source/search_electronic__sub_series.csv", skip = 4)
@@ -50,4 +83,8 @@ search_electronic_results %>%
 ## run the API
 plumb("api.R")$run(port=8000)
 
+
+
+
+government_fonds <- read_results_json("data/source/browse__fonds_collections__government.json")
 
