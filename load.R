@@ -60,7 +60,7 @@ search_electronic_results %>%
       )
   ) %>%
   filter(LanguageOfCataloging == "eng") %>%
-  filter(Source == "Private") %>% ## "Private" or "Government"
+  filter(Source == "Government") %>% ## "Private" or "Government"
   filter(str_detect(Title, "electronic")) %>%
   filter(str_detect(TypeOfMaterial, regex("Textual", ignore_case = TRUE))) %>%
   remove_extra_columns() %>%
@@ -85,6 +85,16 @@ plumb("api.R")$run(port=8000)
 
 
 
+search_electronic_results <- read_csv("data/out/search_electronic_results.csv")
 
 government_fonds <- read_results_json("data/source/browse__fonds_collections__government.json")
+
+gov_db_flat_file <- read_results_json("data/source/search__db_flat_file__government.json")
+gov_db_flat_file %>% write_csv("data/out/search__db_flat_file__government.csv")
+
+gov_dataset <- read_results_json("data/source/search__dataset__government.json")
+gov_dataset %>% write_csv("data/out/search__dataset__government.csv")
+
+gov_word_processing <- read_results_json("data/source/search__word_processing__government.json")
+gov_word_processing %>% write_csv("data/out/search__word_processing__government.csv")
 
